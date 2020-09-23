@@ -12,10 +12,9 @@ const sprite = new Image();
 sprite.src = "img/sprite.png";
 
 const sprite_one = new Image();
-sprite_one.src = "img/topham_1.png";
-
-const sprite_two = new Image();
-sprite_two.src = "img/todd.png";
+// sprite_one.src = "img/topham_1.png";
+// sprite_one.src = "img/todd_1.png";
+sprite_one.src = "img/chenhansa_1.png";
 
 // LOAD SOUNDS
 const SCORE_S = new Audio();
@@ -47,7 +46,7 @@ const startBtn = {
     y : 263,
     w : 83,
     h : 29
-}  
+}
 
 // CONTROL THE GAME
 cvs.addEventListener("click", function(evt){
@@ -65,7 +64,7 @@ cvs.addEventListener("click", function(evt){
             let rect = cvs.getBoundingClientRect();
             let clickX = evt.clientX - rect.left;
             let clickY = evt.clientY - rect.top;
-            
+
             // CHECK IF WE CLICK ON THE START BUTTON
             if(clickX >= startBtn.x && clickX <= startBtn.x + startBtn.w && clickY >= startBtn.y && clickY <= startBtn.y + startBtn.h){
                 pipes.reset();
@@ -82,17 +81,17 @@ cvs.addEventListener("click", function(evt){
 const bg = {
     sX : 0,
     sY : 0,
-    w : 275,
+    w : 100,
     h : 226,
     x : 0,
     y : cvs.height - 226,
-    
+
     draw : function(){
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
-        
+
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h);
     }
-    
+
 }
 
 // FOREGROUND
@@ -103,15 +102,15 @@ const fg = {
     h: 112,
     x: 0,
     y: cvs.height - 112,
-    
+
     dx : 2,
-    
+
     draw : function(){
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
-        
+
         ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h);
     },
-    
+
     update: function(){
         if(state.current == state.game){
             this.x = (this.x - this.dx)%(this.w/2);
@@ -134,29 +133,29 @@ const bird = {
     sW : 745,
     sH : 967,
     radius : 12,
-    
+
     frame : 0,
-    
-    gravity : 0.25,
+
+    gravity : 0.2,
     jump : 4.6,
     speed : 0,
     rotation : 0,
-    
+
     draw : function(){
         let bird = this.animation[this.frame];
-        
+
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
         ctx.drawImage(sprite_one, bird.sX, bird.sY, this.sW, this.sH,- this.w/2, - this.h/2, this.w, this.h);
-        
+
         ctx.restore();
     },
-    
+
     flap : function(){
         this.speed = - this.jump;
     },
-    
+
     update: function(){
         // IF THE GAME STATE IS GET READY STATE, THE BIRD MUST FLAP SLOWLY
         this.period = state.current == state.getReady ? 10 : 5;
@@ -164,14 +163,14 @@ const bird = {
         this.frame += frames%this.period == 0 ? 1 : 0;
         // FRAME GOES FROM 0 To 4, THEN AGAIN TO 0
         this.frame = this.frame%this.animation.length;
-        
+
         if(state.current == state.getReady){
             this.y = 150; // RESET POSITION OF THE BIRD AFTER GAME OVER
             this.rotation = 0 * DEGREE;
         }else{
             this.speed += this.gravity;
             this.y += this.speed;
-            
+
             if(this.y + this.h/2 >= cvs.height - fg.h){
                 this.y = cvs.height - fg.h - this.h/2;
                 if(state.current == state.game){
@@ -179,7 +178,7 @@ const bird = {
                     DIE.play();
                 }
             }
-            
+
             // IF THE SPEED IS GREATER THAN THE JUMP MEANS THE BIRD IS FALLING DOWN
             if(this.speed >= this.jump){
                 this.rotation = 90 * DEGREE;
@@ -188,7 +187,7 @@ const bird = {
                 this.rotation = -25 * DEGREE;
             }
         }
-        
+
     },
     speedReset : function(){
         this.speed = 0;
@@ -203,13 +202,13 @@ const getReady = {
     h : 152,
     x : cvs.width/2 - 173/2,
     y : 80,
-    
+
     draw: function(){
         if(state.current == state.getReady){
             ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
         }
     }
-    
+
 }
 
 // GAME OVER MESSAGE
@@ -220,19 +219,19 @@ const gameOver = {
     h : 202,
     x : cvs.width/2 - 225/2,
     y : 90,
-    
+
     draw: function(){
         if(state.current == state.over){
-            ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);   
+            ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
         }
     }
-    
+
 }
 
 // PIPES
 const pipes = {
     position : [],
-    
+
     top : {
         sX : 553,
         sY : 0
@@ -241,31 +240,31 @@ const pipes = {
         sX : 502,
         sY : 0
     },
-    
+
     w : 53,
     h : 400,
-    gap : 85,
+    gap : 150,
     maxYPos : -150,
     dx : 2,
-    
+
     draw : function(){
         for(let i  = 0; i < this.position.length; i++){
             let p = this.position[i];
-            
+
             let topYPos = p.y;
             let bottomYPos = p.y + this.h + this.gap;
-            
+
             // top pipe
-            ctx.drawImage(sprite, this.top.sX, this.top.sY, this.w, this.h, p.x, topYPos, this.w, this.h);  
-            
+            ctx.drawImage(sprite, this.top.sX, this.top.sY, this.w, this.h, p.x, topYPos, this.w, this.h);
+
             // bottom pipe
-            ctx.drawImage(sprite, this.bottom.sX, this.bottom.sY, this.w, this.h, p.x, bottomYPos, this.w, this.h);  
+            ctx.drawImage(sprite, this.bottom.sX, this.bottom.sY, this.w, this.h, p.x, bottomYPos, this.w, this.h);
         }
     },
-    
+
     update: function(){
         if(state.current !== state.game) return;
-        
+
         if(frames%100 == 0){
             this.position.push({
                 x : cvs.width,
@@ -274,9 +273,9 @@ const pipes = {
         }
         for(let i = 0; i < this.position.length; i++){
             let p = this.position[i];
-            
+
             let bottomPipeYPos = p.y + this.h + this.gap;
-            
+
             // COLLISION DETECTION
             // TOP PIPE
             if(bird.x + bird.radius > p.x && bird.x - bird.radius < p.x + this.w && bird.y + bird.radius > p.y && bird.y - bird.radius < p.y + this.h){
@@ -288,10 +287,10 @@ const pipes = {
                 state.current = state.over;
                 HIT.play();
             }
-            
+
             // MOVE THE PIPES TO THE LEFT
             p.x -= this.dx;
-            
+
             // if the pipes go beyond canvas, we delete them from the array
             if(p.x + this.w <= 0){
                 this.position.shift();
@@ -302,28 +301,28 @@ const pipes = {
             }
         }
     },
-    
+
     reset : function(){
         this.position = [];
     }
-    
+
 }
 
 // SCORE
 const score= {
     best : parseInt(localStorage.getItem("best")) || 0,
     value : 0,
-    
+
     draw : function(){
         ctx.fillStyle = "#FFF";
         ctx.strokeStyle = "#000";
-        
+
         if(state.current == state.game){
             ctx.lineWidth = 2;
             ctx.font = "35px Teko";
             ctx.fillText(this.value, cvs.width/2, 50);
             ctx.strokeText(this.value, cvs.width/2, 50);
-            
+
         }else if(state.current == state.over){
             // SCORE VALUE
             ctx.font = "25px Teko";
@@ -334,7 +333,7 @@ const score= {
             ctx.strokeText(this.best, 225, 228);
         }
     },
-    
+
     reset : function(){
         this.value = 0;
     }
@@ -344,7 +343,7 @@ const score= {
 function draw(){
     ctx.fillStyle = "#70c5ce";
     ctx.fillRect(0, 0, cvs.width, cvs.height);
-    
+
     bg.draw();
     pipes.draw();
     fg.draw();
@@ -366,7 +365,7 @@ function loop(){
     update();
     draw();
     frames++;
-    
+
     requestAnimationFrame(loop);
 }
 loop();
